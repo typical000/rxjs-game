@@ -10,7 +10,35 @@ body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-  background: #333;
-  color: #eee;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  background: #24292e;
+  color: #f9f9f9;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+:global(.app) {
+  width: 100%;
+  height: 100%;
+}
+
+:global(.header) {
+  position: absolute;
+  z-index: 10;
+  top: 20px;
+  left: 20px;
+}
+
+:global(.title) {
+  font-weight: bold;
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+:global(.highlight) {
+  color: #f1d600;
+  font-weight: bold;
+  text-decoration: none;
 }
