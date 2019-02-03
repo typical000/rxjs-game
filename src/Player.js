@@ -1,4 +1,9 @@
-import {Graphics} from 'pixi.js';
+import {Graphics, DEG_TO_RAD} from 'pixi.js';
+
+/**
+ * Maximal rotation average for plater when it moves left/right
+ */
+const MAX_ROTATION = DEG_TO_RAD * 45;
 
 /**
  * Player class. We can interact with him via keyboard.
@@ -10,6 +15,12 @@ export default class Player {
 
     // Available area where player can be situated
     this.areaSize = areaSize;
+
+    // Nothing, will be set in 'setPosition'
+    this.x = null;
+    this.y = null;
+
+    this.graphics.angle = 0;
 
     this.radius = 10;
     this.lineThikness = 1;
@@ -24,8 +35,8 @@ export default class Player {
    */
   getPosition() {
     return {
-      x: this.x,
-      y: this.y,
+      x: this.graphics.x,
+      y: this.graphics.y,
     };
   }
 
@@ -67,7 +78,7 @@ export default class Player {
    */
   setPosition({x, y}) {
     // If posiiton is the same - avoid redraw
-    if (x === this.x && y === this.y) {
+    if (x === this.graphics.x && y === this.graphics.y) {
       return this;
     }
 
@@ -75,11 +86,32 @@ export default class Player {
       return this;
     }
 
-    this.x = x;
-    this.y = y;
+    this.graphics.x = x;
+    this.graphics.y = y;
     this.draw();
 
     return this;
+  }
+
+  /**
+   * @param {number} deg
+   */
+  rotateBy(deg) {
+    const newRotation = this.graphics.rotation + DEG_TO_RAD * deg;
+    if (newRotation <= MAX_ROTATION && newRotation >= -MAX_ROTATION) {
+      this.graphics.rotation = newRotation;
+    }
+  }
+
+  /**
+   * Reset rotation to 0 degree. Invocation of this function will restore by 1 degree
+   */
+  resetRotation() {
+    const {rotation} = this.graphics;
+
+    if (rotation !== 0) {
+      this.graphics.rotation += rotation > 0 ? -DEG_TO_RAD : DEG_TO_RAD;
+    }
   }
 
   /**
@@ -90,10 +122,11 @@ export default class Player {
    * @public
    */
   updatePositionByOffset({x, y}) {
-    const updatedX = this.x + x;
-    const updatedY = this.y + y;
+    const updatedX = this.graphics.x + x;
+    const updatedY = this.graphics.y + y;
     // Avoid unneded redraws
-    if (updatedX === this.x && updatedY === this.y) {
+    if (updatedX === this.graphics.x && updatedY === this.graphics.y) {
+      this.resetRotation();
       return this;
     }
 
@@ -107,8 +140,13 @@ export default class Player {
       return this;
     }
 
-    this.x = updatedX;
-    this.y = updatedY;
+    // If X was changed - means that is horizontal move
+    if (x) {
+      this.rotateBy(x);
+    }
+
+    this.graphics.x = updatedX;
+    this.graphics.y = updatedY;
     this.draw();
 
     return this;
@@ -118,16 +156,17 @@ export default class Player {
    * @public
    */
   draw() {
-    const {x, y, radius} = this;
+    const {radius} = this;
 
     this.graphics.clear();
     this.graphics.lineStyle(this.lineThikness, this.lineColor);
     // prettier-ignore
     this.graphics.drawPolygon(
-      x, y - radius,
-      x + radius, y + radius,
-      x - radius, y + radius,
-      x, y - radius,
+      0, - radius,
+      radius, radius,
+      0, radius / 2,
+      -radius, radius,
+      0, -radius,
     );
 
     return this;

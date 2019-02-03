@@ -71,6 +71,10 @@ const keyboard$ = merge(
   fromEvent(document, 'keyup', () => DIRECTION_KEY.NONE),
 ).pipe(startWith(DIRECTION_KEY.NONE));
 
+/**
+ * Main game class.
+ * Creates player, flying things and all other interacitive things.
+ */
 export default class Game {
   /**
    * @param {Object} DOMNode - DOM node where mount scene
@@ -108,6 +112,7 @@ export default class Game {
     const size = getWindowSize();
 
     this.player = new Player(this.stage, size);
+
     this.player.setPosition({
       x: size.width / 2,
       y: size.height - 50,
